@@ -1,0 +1,390 @@
+REACT TESTING: 
+    manual testing : a person checks everything manually on a webpage.
+    automated testing: script that makes up the testing and does check on a stretch
+    course structure: RTL,JEST,testing fundamentals, test components with user interactions, test components wrapped in a provider, testing components with mocking(api mocks),static analysis testing
+
+RTL vs JEST:
+   jest - js testing framework, it is test runner that finds test,runs test, determines whether the tests
+          passed or failed and reports it back in human readable manner 
+    RTL - js testing utility that provides virtual DOM for testing react components
+          RTL provides virtual DOM to interact with and verify the behaviour of react components
+          tesing library is infact a family of packages which helps to test UI components
+          the core library is called DOM testing library and RTL is simply a wrapper around this core library to test react apps in easier way
+
+types of test:
+    unit test:
+        focus is on testing the individual building blocks of an app sucha as class/function or a component
+        each unit is tested in isolation and independent of other units
+        dependencies are mocked
+        runs in short time, easier to write,run and maintain and easy way to pinpoint failures
+    Integration test:
+        focus on testing combinations of units and ensuring they work together.. like 2 unit features under a single module
+        they take time longer than unit test.
+    E2E(end to end) test:
+        focus on testing entire app flow and ensuring it work as designed from start to finish
+        involves in real UI, a real backend DB , real services etc
+        take longest time as they cover the most amount of code and cases.
+        might involve cost implication as real api request hits are done as part of test
+    order of testing : unit test-> Integration -> E2E test.
+    RTL philosphy: the more your test resembles the way your software is used,the more confidence they can give you.
+    in this course : we do bit of both unit test (component level) nd E2E test( user interaction with component).. we wouldn't test the implementation details of component
+    not on how react handles interaction,events or rendering part or other react internal logic.
+    RTL will not care if you add 4+4 or 5+3 to get 8 but it checks only whether 8 is there or not
+    refactoring code will not affect test as long as your end result will be same
+    it's like functional testing on bigger view.
+
+automated test:
+    it throws when the actual output doesn't match with expected output.
+    for understanding: file : nameTest.js
+    run it by : node nameTest.js
+
+project setup:
+    set up the project.
+    cmd : npx create-react-app . --template typescript ==> for creating the typescript based project on the current directory
+    npm start => to run the site
+    we here focused on writing the unit test which mostly done on cli responses rather than the browser side
+    the above commands added RTL,jest into the project by default here, we can see it in the package.json. .. in react-scripts also their package.json has the jest,testing-library-dom etc..
+
+Running tests:
+    we could see that the app.tsx also has the app.test.tsx, by default it is having a test case.. which ensures whether the 'learn react ' link is present or not
+    wkt jest is test-runner that runs and provides the result.. to run the test.. in package.json we have the scripts where we have 'react-scripts test' .. thus we could do like npm test
+    it makes the project to start the jest in watch mode.. in console.. follow/chose options to explore
+    it is failing in our case .. due to named exports in  file:///Users/dhanushholla/Desktop/react%20testing%20library%20by%20code-evolution/react-testing-practice/node_modules/jest-watch-typeahead/build/file_name_plugin/prompt.js:4
+    thus i'm skipping this.
+    
+Anatomy of a test:
+    in app.test.tsx : we need a function named test.
+    test fn : test(name,Fn,timeout) 
+    name-> name of the test
+    Fn-> function that contaims the expectations to test
+    timeout -> optional argument, specifies how long to wait before aborting the test, default timeout os 5 seconds
+    in app.test.tsx file we have the name as renders learn react link
+    the fn has to create a virtual dom for testing which is done with the help of the render(<app/>).
+    next we used screen from RTL that has query like getbyText - accepts string/regex as param & here to find the learn react link and then we have expect() which means what should be there.. here expect(linkelement).tobeindocument();
+    wkt render(),screen() are from RTL but expect() and tobeindocument()? is from where?
+    it is from create-react-app provided globally from the jest as source.
+    thus here we have jest+RTL in combo to test out.
+
+creating our own test:
+    create a new dir called components under src, then create greet dir under it and file named greet.tsx and then write a new greet.test.tsx file which check whether the word hello is there or not
+    same cmd : npm test and checkout the working if possible
+
+test driven development:
+    software development process where we write tests before writing the software code
+    once the tests have been written, then we should write a code in such a way that passes all tests mentioned before
+    it has 3 phases:
+          create tests that verify the functionality of specific feature
+          write software code that will run the test successfully when re-executed
+          refactor the code for optimization while ensuring the tests continue to pass
+    this is also called red-green testing as all test cases move from red(error) state to green (success) state
+    eg : greetttd.tsx 
+
+JEST:
+    watch mode in jest:
+        when we run yarn test/npm test .. behind the scene .. it makes the jest to run in watch mode config
+        watch mode is an option that we can pass to jest asking to watch files that have chnaged since the last commit and execute tests related only to those changed files
+        optimization to run test fast regardless of how many tests you have
+        it could be seen that the test file for app isn't running but only running for the greet component which is chnaged from last commit
+
+filtering test:
+    use the watch usage w options with t,a,q,p options with their designated options-map for filtering.
+    if a file with test() is made as test.only() the that particular test only be executed
+    test.skip() will allow you to skip the tests
+
+grouping test:
+    to group a number of tests.. we can use the describe() that jests provides globally 
+    describe(name,fn)
+    name ->  the test group name
+    fn -> the function that contains the tests to be executed
+    eg: in greettdd.test.tsx file
+    it is also possible to use describe.only() and describe.skip();
+    it is also possible to nest the descibe() blocks and also we can have multiple describe() blocks independently
+    test suite means no of files being tested .. don't confuse it with no of describe() blocks.
+    tests ==> means the individual testcases count
+
+Filename Conventions:
+    with create-react-app .. the jest will look for the tesing files with the following naming conventions:
+        files with filename.test.js or filename.test.tsx
+        files with filename.spec.js or filename.spec.tsx
+        files with .js or .tsx in __tests__ folders.
+    recommended to put out your tests next to the code file you're testing so relative imports are shorter
+    with the help of jest global providing we can remove the test() and replace that it().. which would also work the same
+    so test.only() can be written as fit() and test.skip() can be written as xit().
+
+Code coverage with jest:
+    it is a metric that help you measure out how much of your code was tested
+    statement coverage: how many of statements in the software code have been executed
+    branches coverage: how many of branches of control structures(if-else) have been executed
+    function coverage: how many of the functions defined have been called
+    line coverage : how many of lines of source have been tested
+    with jest and create-react-app .. with 0 config ..we can get the coverage reports => code-coverage reports
+    now go to package.json and add coverage: npm test --coverage in scripts then do npm run coverage
+    table type output is not achieved..yet to check on it
+    append --watchAll options in that same script like npm test --coverage --watchAll
+    to make the coverage only on the working/specific folder like components here .. we gonna make like npm test --coverage --watchAll --collectCoverageFrom='src/components/**/*.{ts,js,tsx}'
+    say if we had an actionTypes..in the folder, to neglect those files during coverage use : npm test --coverage --watchAll --collectCoverageFrom='src/components/**/*.{ts,js,tsx}'  --collectCoverageFrom='!src/components/**/*.{types,stories,constants,test,spec}.{ts,tsx}'
+    coverage threshold:
+        with jest it is possible to put a minimum threshold enforcement for the coverage. if thresholds aren't made then those tests will fail.
+        to do so.. in package.json add jest :{ ... necessary} and npm run coverage it will change if the logic in greettddfor name display is made into ternary operator
+    jest also generates the html file of the coverage report, it could be found in coverage directory/index.html
+    but it is not working for me.. dont know why
+
+Assertions:
+    while writing test.. we need to check that the certain values must meet/have certain conditions
+    in our case.. we're checking that the word 'hello' or the name 'dhanush' should be present in the virtual dom
+    assertions decide if a test passes or fails and it be a crucial part of writing test
+    in jest assertions are carried out with the global expect(value) .. where the value must be the thing that our code produces .. like a made up dom node
+    typically you will use a matcher function with expect to assert something about a value
+    a matcher can optionally accept an argument which is the correct expected value
+    in our case .. tobeindocument() is the matcher() which meant to see the value presence in the DOM node nothing less or more
+    various matcher fns : https://jestjs.io/docs/using-matchers
+    jest provided global matcher and out of box matcher that doesn't involve testing the UI or the DOM.. so we extend it for dom by adding a package called jest-dom..which in turn has tobeindocument()
+    https://github.com/testing-library/jest-dom
+    setuptest.ts is the file that jest automatically executed as it is a global test setup config file..before any test cases testing is done
+    EOF - jest basics
+
+what to test:
+    things that are worthy to test are as follows:
+        testing the component rendering
+        test the component renders with correct set of props
+        test the component rendering in different states eg:say username should be dhanu while login with password..else it must be guest
+        test the component reacts to events such as button click,form input and submission etc..
+    what not to test:
+        implementation details testing must be avoided .. by rtl guideline : test whether result is correct or not.. not the logic that brings the result
+        third party code must not be used
+        dont test code that is not important from a user point of view.. eg like a utility function/helper that renders up say current date
+
+RTL Queries:
+    basic steps of rtl testing:
+        1) render the component
+        2) find an element rendered by the component
+        3) assert against the element found in the step 2 which will pass or fail the test.
+
+        for step 1 we use render() from rtl under test()
+        for step3/assertion we use the expect() and also the matcher() from jest/jest-dom
+        queries are the methods that RTL provides to find elements on the page
+        like:
+            single elements acquiring : getBy,queryBy,findBy...
+            multiple elements acquiring: getAllBy,QueryAllBy,findAllBy...
+            these methods will have suffix that can be either : role,labelText, Text, DisplayValue, AltText, Title and TestId.  
+        getBy queries:
+            these are a class of queries return the matching node for a query and throw an descriptive error if no elements match or if more than one match is found.
+
+getByRole queries:
+    it queries for elements with given role.
+    role refers to ARIA(accessible rich internet apps) role which provide semantic mening to the content to ensure people using asssitive technologies are ablt to use them
+    by default many sematic elements in HTML have a role
+    eg: button has button role, checkbox has checkbox role, h1-h6 has header role and so on
+    if an element has no role and you wish to add a role to it.. make use of the 'role' attribute to assign your desired role value to it
+    eg : application folder and application.tsx and added application.test.tsx
+    it is added to app.tsx and app.test.tsx was deleted as we going to change it from now
+    to know the role attribute of each elements : see the  docs in testinglibrary.com
+
+getByRole options:
+    lets add a textarea in the form control in the application.tsx and proceed further
+    there we get like "  TestingLibraryElementError: Found multiple elements with the role "textbox""
+    it is because the default role of both textarea and input type="text" are textbox
+    this issue needs to be resolved as the getbyrole will return only one element with role and makes another one as test case failing.
+    thus we are going to use options in getbyrole which is nothing but the name attribute option
+    getbyRole(roletobefetched,options)
+            here the options will be an object with key-value pair where here key is name 
+            the name : accessible name is for simple cases equal to:
+                            label of form element   
+                            text content of a button
+                            value of aria-label attribute
+    in our case, we have the input component with label with the innertext content as Name thus make changes to the test(proceed with label of form element with innertext content type)
+    now after that going to wrap the form element with react fragment and do some changes like adding 2 header. testingit will be error as it causes the h1-h6 have heading role making it multiple heading role elements found
+    we can either use the name options in getbyrole or use the level options which is nothing but specific to header element h1<h6
+    there are other options like name,level,hidden,selected,checked,pressed etc.. refer it in docs
+    options will be an object with 1 or more specifications like combo of name,level etc...
+
+getByLabelText:
+    this will search for the label that matches the given text and then find the element associated with that label
+    this will also work with the wrapper labels.. for eg in the terms and conditions checkbox. like input element checkbox + terms content wrapped inside label element but there is no For attribute in that label
+    assume we have 2 elements with same label.. then getByLabelText will return error 
+    to overcome it , we have the second attribute with selector as key and the value as the html element type
+
+getByPlaceholderText:
+    it will search for all elements with a placeholder attribute and find one that matches the given text
+
+getByText:
+    it will search for all elements that have a textnode with textcontent matching that given text
+    typically we would use to find para,div,span elements by this
+
+getByDisplayValue:
+    it returns the input,textarea or select element that has matching display value attribute
+
+getByAltText:
+    it will return the element that has given alt text.
+    it supports elements that has alt attributes like <img>,<input>,<area> or other custom HTMl elements
+
+getByTitle:
+    it will return the element with the matching title attribute
+
+getbyTestId:
+    it will return the element that has matching data-testid attribute
+
+priority order for queries:
+    use often to useminimun order : getByRole>getByLabelText>getByPlaceholderText>getByText>getByDisplayValue>getByAltText>getByTitle>getbyTestId
+
+query multiple elements:
+    try to use the getAllBY queries. it returns an array of all matching nodes for a query and throws an error if no elements match
+    we will focus on getallbyrole query. to proceed with we go for the skills dir.
+
+TextMatch:
+    we see the first arg to the getbyprefix methods are just strings type but it is not... this is called TextMatch.
+    textMatch can be a string,regex or a function.
+    assume we have <div>hello</div>
+    string : screen.getbyText('hello');
+    regex: screen.getbytext(/hello/i);
+    custom fn : (content?: string, element?: ELement | null) => boolean
+                screen.getByText((content)=>content.startsWith('hello'))
+
+queryBy:
+    what if we want to test the element that is not rendered in the DOM?
+    changed the skills.tsx file
+    as the start lerning button was not in the dom when isloggin is false.. the getby method will throw error 
+        TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "start learning"
+        as it can't find the node in dom
+    thus to check/test out the element not in the dom ... then we go for queryBy/queryallBy
+    queryBy:return matching node for a query and return null if no elements match
+            useful for asserting an element that is not present
+            throws error if more than 1 match found
+    QueryAllBy: retruns array of all matching nodes for a query and return empty array if no elements match
+
+
+FindBy:
+    getBy & getAllBY class of querires to asserts if elements are present in DOM
+    queryBy & queryallBy for the elements not present in the DOM
+    what if elements are not present in the DOM to begin with but will make their way into the DOM after sometime?
+     like situation where data fetched from server will be rendered after a few seconds gap 
+    for sudden apperance and disapperance of elements in the dom must be handled via findby queries
+    somechanges made in skills.tsx like setisloggedin is made true after 500 milliseconds from component mounting stage
+    findBy: returns a promise which resolves when an element is found which matches the given query
+            promise is rejected if no element is found or if more than one lement is found after a default timeout of 1000ms
+    findAllBy: returns a promise which resolves to an array of elements when any elements are found which match given query
+    as it returns promise we must use async await.. we can pass thrid argument to override the default timeout limit
+
+Manual queries:
+    it is nothing but using the regular querySelector DOM API to find elements
+    eg : const {container} = render(<mycomponent/>)
+         const foo = conatiner.querySelector('[data-foo="bar"]')
+
+Debugging with RTL:
+    debug a test?:
+            thats nothing but understanding the DOM structure and seeing why an assertion might fail
+            Usually RTL shows out why the error occurred and where it occured with the help of modified DOM tree structure
+            but it would be great if we could write assertion with help of DOM tree side by side
+            this can be achieved by using the debug()
+            we can also use the logroles() for debugging purposes from the DOM testing library
+            logRoles() can be used to printout all the implicit ARIA-role within a tree of dom nodes, each role containing the list of all nodes containing the rolses
+
+testing playground:
+    chrome extension to find out best possible queries for testing the elements 
+
+User interactions:
+    if the software allows the interactions say mouse click/key press then corresponding things should also have the necessary testing
+    we gonna achieve it by using the 'user-event' library
+    user-event is a companion library for tesing library that simulates user interactions by dispatching the vents that would happen if the interaction took place in browser
+    user-event vs fire-event:
+         fire event is a method from RTL which is used to dispatch DOM events
+         user-event simulates full interactions which may fire multiple events and do additional checks along the testing way
+         for example   we can dispatch the change event on an input field using fire event
+         when a user types into a textbox the element has to be focused and then keyboard and input events are fired and election and value on the element are manipulated as they type
+         BUT user-event allow you to describe a user interaction instead of concrete event. it adds visibility and intractability checks along the way and manioulates DOM just like a 
+         user interaction in browser would. it factors in that browser. EG: wouldn't let a user click a hidden element or type in a disabled textbox
+    create-react-app by default provides the user-event library to work with.
+
+Pointer interactions:
+    testing mouse interactions:
+        created counter dir
+    note all user-event functions are async..thus utilise async,await
+    note that click() is not a pointer interaction api.. it is nothing but a convenience API(which inturn calls out the pointer api)
+    other convenience api : click(), dblClick(), tripleClick(), hover(), unhover().
+    we do have the low level pointer apis to work with
+    we can pass the object as arg to pointer with keys:value where value is needed event
+    eg :
+        pointer({keys:'[MouseLeft]'})
+        pointer({keys:'[MouseLeft][MouseRight'})
+        pointer('[MouseLeft][Mouseright]')
+        pointer('[mouseLeft>]')  :: for keeping left mouse button pressed but not released
+        pointer('[/MouseLeft]')  :: for releasing the left mouse button
+
+Keyboard interactions:
+    modified the counter component a little bit
+    and also modified counter.test.tsx
+    user.type(onwhichelementtobetyped,whattobetyped) .. it is the method from user-event for keyboard interactions
+    type() and tab() are not a part of keyboard api..they are called utility api- type() and convenience api -tab()
+    other utility api of keyboard interactions: clear(),selectOptions(),deselectOptions()
+    eg:
+        test('select options', async()=>{
+          render(
+            <select multiple>
+                <option value="1">a</option>
+                <option value="2">b</option>
+                <option value="3">c</option>
+            </select>
+            )
+            await userEvent.selectOptions(screen.getbyRole('listbox'),['1','c'])
+            expect(screen.getbyRole('option',{name:'a'}).selected).toBe(true); 
+            expect(screen.getbyRole('option',{name:'b'}).selected).toBe(false); 
+            expect(screen.getbyRole('option',{name:'c'}).selected).toBe(true); 
+        })
+        we can specify either the label or value while asserting the selection conditions during expecting
+    upload():
+         it is used to change the file input as if a user clicked it and selected files in resulting file upload dialog
+         eg:
+            test('upload file',async()=>{
+                render(
+                    <div>
+                    <label htmlFor='file-uploader'>Upload file:</label>
+                    <input id="file-uploader' type="file"/>
+                    </div>
+                )
+                const file = new File(['hello'],'hello.png',{type:'image/png'})
+                const input=screen.getByLabelText(/upload file/i)
+                await userEvent.upload(input,file)
+                expect(input.files[0]).tobe(file)
+                expect(input.files.item(0)).tobe(file)
+                expect(input.files).tohaveLenght(1)
+            })
+        we also have the clipboard api's to work with keyboard interactions
+            copy(),cut() and paste()
+        lower level keyboard api's:
+            keyboard('foo') => f then o then o
+            keyboard('{shift>}A{/Shift}') => translates to shift(down), A , shift(up)
+
+Providers:
+    skipped this video
+    render(<ourcomponent/>,{wrapper:wrappercomponentname}) .. useful incase of the themeprovider or other controlled components
+    if there is a main component that had to be wrapper for all components then rather than specifying it individually each time we can wrap it once and get done with it .. lets discuss it below
+
+Render functions:
+    assume a wrapper like themeprovider/redux provider which has to wrapped at the top level for all other dependant components.. then we follow the steps as:
+    single wrapper mentioning to all test renders can be achieved via CUSTOM RENDER()
+     testinglibrary.com/docs/frameworks/RTL/setup we would have the custom render
+     ie by making test-utils.tsx and make necessary import and path changes in our test files
+
+custom react hooks testing:
+    we will make use of the custom hook.. normal render(),screen() can't be used for hook. thus use renderhook() and that will return an object ..which would have a property called result to make assertions
+
+Act utility:
+    we're going to test increment,decrement fn from the custom hooks
+    when testing code that causes eact state updates must be wrapped into act(...);
+    act() will makes sure the state update actions are done before the assertions check
+
+Mocking functions with jest:
+    a new component was used counter-two
+    here in this test case.. assume the parent component is not yet fully finished/not ready to provide the handleincrement and handledecrement functions
+    these are the cases where we have to mock that functions.
+
+Mocking Http request:
+    a new component called users.
+    we know real api are used for E2E TEST NOT FOR unit test .. here we need to check either error msg or the users present or not
+    thus rather than the real api endpoint we're going to mock the api http request using jest
+    to mock the api's with RTL and jest we gonna use the 'mock service worker' package
+    it is api mocking library that internally uses service worker api to intercept actual request, like closest thing to mock a server without having to create/setup one
+    thus we will work with msw further as follows.
+    
+
+
